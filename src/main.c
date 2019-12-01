@@ -2,9 +2,12 @@
 
 int main(void)
 {
+    CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
+
     return 0;
 }
 
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *   where the assert_param error has occurred.
@@ -25,3 +28,4 @@ void assert_failed(u8* file, u32 line)
   {
   }
 }
+#endif

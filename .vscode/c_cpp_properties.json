@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "STM8S_StdPeriph_Driver/inc",
+                "/usr/local/sdcc/share/sdcc/include"
+            ],
+            "defines": [
+                "SDCC",
+                "USE_STDPERIPH_DRIVER",
+                "STM8S003"
+            ],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/local/sdcc/bin/sdcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
