@@ -141,6 +141,10 @@ INTERRUPT_HANDLER(EXTI_PORTC_IRQHandler, 5)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  if (RESET == GPIO_ReadInputPin(GPIOC, GPIO_PIN_3)) {
+     UART1_SendData8(0x01);
+  }
+
 }
 
 /**
@@ -345,6 +349,13 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
     /* In order to detect unexpected events during development,
        it is recommended to set a breakpoint on the following instruction.
     */
+   u8 data;
+   data = UART1_ReceiveData8();
+   if (data == '1') {
+
+   } else {
+
+   }
  }
 #endif /* (STM8S208) || (STM8S207) || (STM8S103) || (STM8S001) || (STM8S903) || (STM8AF62Ax) || (STM8AF52Ax) */
 

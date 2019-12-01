@@ -15,7 +15,14 @@ project(STM8Blink C)
 SET(CMAKE_C_FLAGS "-mstm8 --std-c99")
 add_definitions(-DSDCC -DSTM8S003)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "dist")
-add_executable(main src/main.c src/stm8s_it.c STM8S_StdPeriph_Driver/src/stm8s_adc1.c STM8S_StdPeriph_Driver/src/stm8s_beep.c STM8S_StdPeriph_Driver/src/stm8s_exti.c STM8S_StdPeriph_Driver/src/stm8s_itc.c STM8S_StdPeriph_Driver/src/stm8s_clk.c)
+add_executable(main src/main.c src/stm8s_it.c 
+            STM8S_StdPeriph_Driver/src/stm8s_tim1.c 
+            STM8S_StdPeriph_Driver/src/stm8s_beep.c 
+            STM8S_StdPeriph_Driver/src/stm8s_exti.c 
+            STM8S_StdPeriph_Driver/src/stm8s_itc.c 
+            STM8S_StdPeriph_Driver/src/stm8s_uart1.c 
+            STM8S_StdPeriph_Driver/src/stm8s_clk.c 
+            STM8S_StdPeriph_Driver/src/stm8s_gpio.c)
 
 # set_target_properties(main 
 #     RUNTIME_OUTPUT_DIRECTORY "dist"
