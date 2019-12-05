@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_C_OUTPUT_EXTENSION ".rel")
-set(CMAKE_C_COMPILER /usr/local/sdcc/bin/sdcc)
+set(CMAKE_C_COMPILER /usr/local/bin/sdcc)
 set(CMAKE_SYSTEM_NAME Generic) # No linux target etc
 
 include_directories("STM8S_StdPeriph_Driver/inc" "inc")
@@ -15,14 +15,7 @@ project(STM8Blink C)
 SET(CMAKE_C_FLAGS "-mstm8 --std-c99")
 add_definitions(-DSDCC -DSTM8S003)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "dist")
-add_executable(main src/main.c src/stm8s_it.c 
-            STM8S_StdPeriph_Driver/src/stm8s_tim1.c 
-            STM8S_StdPeriph_Driver/src/stm8s_beep.c 
-            STM8S_StdPeriph_Driver/src/stm8s_exti.c 
-            STM8S_StdPeriph_Driver/src/stm8s_itc.c 
-            STM8S_StdPeriph_Driver/src/stm8s_uart1.c 
-            STM8S_StdPeriph_Driver/src/stm8s_clk.c 
-            STM8S_StdPeriph_Driver/src/stm8s_gpio.c)
+add_executable(main src/main.c src/stm8s_it.c)
 
 # set_target_properties(main 
 #     RUNTIME_OUTPUT_DIRECTORY "dist"
