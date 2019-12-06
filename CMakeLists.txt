@@ -15,10 +15,10 @@ project(STM8Blink C)
 SET(CMAKE_C_FLAGS "-mstm8 --std-c99")
 add_definitions(-DSDCC -DSTM8S003)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "dist")
-add_executable(main src/main.c src/stm8s_it.c)
+add_executable(main src/main.c)
 
 # set_target_properties(main 
 #     RUNTIME_OUTPUT_DIRECTORY "dist"
 # )
 # Flash targets
-add_custom_target(flash ALL COMMAND stm8flash -c stlinkv2 -p stm8s003f3 -w dist/main.ihx DEPENDS main)
+add_custom_target(flash ALL COMMAND /home/leizhouchun/stm8flash/stm8flash.exe -c stlinkv2 -p stm8s003f3 -w dist/main.ihx DEPENDS main)
