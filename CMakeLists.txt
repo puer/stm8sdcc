@@ -21,4 +21,4 @@ add_executable(main src/main.c)
 #     RUNTIME_OUTPUT_DIRECTORY "dist"
 # )
 # Flash targets
-add_custom_target(flash ALL COMMAND /home/leizhouchun/stm8flash/stm8flash.exe -c stlinkv2 -p stm8s003f3 -w dist/main.ihx DEPENDS main)
+add_custom_target(flash ALL COMMAND stm8flash -c stlinkv2 -p stm8s003f3 -w dist/main.ihx DEPENDS main)
