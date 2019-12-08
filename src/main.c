@@ -11,7 +11,6 @@ __IO uint32_t count = 1000;
 void Delay(__IO uint32_t nTime);
 static void TIM4_Config(void);
 static void UART1_Config(void);
-static void TIM1_Config(void);
 void LEDOn(void);
 void LEDOff(void);
 
@@ -27,27 +26,26 @@ INTERRUPT_HANDLER(TIM4_UPD_OVF_IRQHandler, 23)
   TIM4->SR1 = (uint8_t)(~TIM4_SR1_UIF);
 }
 
-INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
+/**
+  * @brief  External Interrupt PORTC Interrupt routine
+  * @param  None
+  * @retval None
+  */
+INTERRUPT_HANDLER(EXTI_PORTC_IRQHandler, 5)
 {
-  if ((TIM1->CR1&0x10)!= 0) {
-    count ++;
-    LEDOn();
-    puts("+");
-  } else {
-    LEDOff();
-    count --;
-    puts("-");
+  /* In order to detect unexpected events during development,
+     it is recommended to set a breakpoint on the following instruction.
+  */
+  static u8 prev = 0;
+  
+  GPIOC->IDR &= 0xc0;
+  u8 n = GPIOC->IDR & 0xc0;
+
+  if (prev != n) {
+    prev = n;
+    puts("C\r\n");
   }
-  TIM1->SR1 = (uint8_t)(~(uint8_t)0x01);
 }
-
-INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
-{
-  puts("TIM1 CAP \r\n");
-  TIM1->SR1 = 0;
-}
-
-
 
 int main(void)
 {
@@ -56,17 +54,16 @@ int main(void)
   enableInterrupts();
   UART1_Config();
   Delay(100);
-  TIM1_Config();
 
   LED_PORT->DDR |= (uint8_t)LED_PIN;
   LED_PORT->CR1 |= (uint8_t)LED_PIN;
   LED_PORT->CR2 &= (uint8_t)(~(LED_PIN));
 
-  // GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_6));
-  // GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_7));
-  // GPIOC->CR2 |= (uint8_t)GPIO_PIN_6 ;
-  // GPIOC->CR2 |= (uint8_t)GPIO_PIN_7 ;
-
+  GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_6));
+  GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_7));
+  GPIOC->CR2 |= (uint8_t)GPIO_PIN_6 ;
+  GPIOC->CR2 |= (uint8_t)GPIO_PIN_7 ;
+  EXTI->CR1 = 0x30;
   puts("main-before\r\n");
   LEDOn();
   while (1)
@@ -85,21 +82,6 @@ void LEDOff(void) {
   LED_PORT->ODR |= (uint8_t)LED_PIN;
 }
 
-static void TIM1_Config(void) 
-{
-  puts("tim1_config\r\n");
-  
-  TIM1->SMCR |= 0x02; //encoder mode 2
-  TIM1->CCMR1 |= 0x01; //IC1FP1映射到TI1)
-  TIM1->CCMR2 |= 0x01; //IC2FP2映射到TI2 CC2 MAP TI2FP2   CH2
-  TIM1->ARRH = 0x00; // 60000产生溢出 最大65535
-  TIM1->ARRL = 0x01;
-  TIM1->IER |=0x01; //开中断 ，开中断前要有中断处理程序 中断处理程序里要清除中断标志
-
-  // TIM1->CNTRH = 0xea;
-  // TIM1->CNTRL = 0x56;
-  TIM1->CR1 = 0x01; // 启动计数
-}
 
 static void TIM4_Config(void)
 {
