@@ -6,7 +6,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 __IO uint32_t TimingDelay = 0;
-__IO uint32_t count = 1000;
+__IO int count = 1000;
 /* Private function prototypes -----------------------------------------------*/
 void Delay(__IO uint32_t nTime);
 static void TIM4_Config(void);
@@ -36,21 +36,59 @@ INTERRUPT_HANDLER(EXTI_PORTC_IRQHandler, 5)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
+  static int rot_enc_table[] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
+static int quarter = 0;
   static u8 prev = 0;
   
-  GPIOC->IDR &= 0xc0;
-  u8 n = GPIOC->IDR & 0xc0;
+  // u8 n = ((GPIOC->IDR)>>6) & 0x03;
 
-  if (prev != n) {
-    prev = n;
-    puts("C\r\n");
+  u8 n = (RE_PORT->IDR & (RE_B_PIN | RE_A_PIN)) >> RE_SHIFT;
+
+
+  if (((prev ^ n) & 0x03) != 0) {
+    prev = ((prev << 2) | n ) & 0x0f;
+
+     if (1 == rot_enc_table[prev])
+    {
+    if (quarter < 0)
+    {
+      quarter = 0;
+    }
+    quarter++;
+    if (quarter == 4)
+    {
+      // right++;
+      count+=50;
+      puts("+\r\n");
+      quarter = 0;
+    }
   }
+  else if (-1 == rot_enc_table[prev])
+  {
+    if (quarter > 0)
+    {
+      quarter = 0;
+    }
+    quarter--;
+    if (quarter == -4)
+    {
+      // left++;
+      if (count >=50)
+        count-=50;
+      puts("-\r\n");
+      quarter = 0;
+    }
+  }
+  } else {
+    printf("%x\r\n", GPIOC->IDR);
+  } 
 }
 
 int main(void)
 {
   CLK->CKDIVR = ((uint8_t)0x0);
   TIM4_Config();
+  EXTI->CR1 |= (uint8_t)((uint8_t)(0x03) << 4);
   enableInterrupts();
   UART1_Config();
   Delay(100);
@@ -59,18 +97,45 @@ int main(void)
   LED_PORT->CR1 |= (uint8_t)LED_PIN;
   LED_PORT->CR2 &= (uint8_t)(~(LED_PIN));
 
-  GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_6));
-  GPIOC->DDR &= (uint8_t)(~(GPIO_PIN_7));
-  GPIOC->CR2 |= (uint8_t)GPIO_PIN_6 ;
-  GPIOC->CR2 |= (uint8_t)GPIO_PIN_7 ;
-  EXTI->CR1 = 0x30;
-  puts("main-before\r\n");
+  // puts("main-0\r\n");
+  // // EXTI->CR1 &= (uint8_t)(~EXTI_CR1_PCIS);
+  // // EXTI->CR1 |= (uint8_t)((uint8_t)(0x02) << 4);
+  // puts("main-1\r\n");
+  // LEDOff();
+  // // RE_PORT->DDR = 0x00;
+  // // RE_PORT->CR1 = 0xff;
+  // // RE_PORT->CR2 = 0x00;
+  // // RE_PORT->DDR &= (uint8_t)(~(RE_PSBTN_PIN));
+  // RE_PORT->DDR &= (uint8_t)(~(RE_A_PIN));
+  // RE_PORT->DDR &= (uint8_t)(~(RE_B_PIN));
+  // puts("main-2\r\n");
+  // // RE_PORT->CR2 |= (uint8_t)RE_PSBTN_PIN ;
+  // puts("main-2.1\r\n");
+  // RE_PORT->CR2 |= (uint8_t)RE_A_PIN ;
+  // puts("main-2.2\r\n");
+  // RE_PORT->CR2 |= (uint8_t)RE_B_PIN ;
+  // puts("main-3\r\n");
+  // EXTI->CR1 = 0x30;
+  // puts("main-before\r\n");
+
+  // EXTI->CR1 &= (uint8_t)(~EXTI_CR1_PCIS);
+  RE_PORT->DDR &= (uint8_t)(~(RE_A_PIN));
+  RE_PORT->DDR &= (uint8_t)(~(RE_B_PIN));
+  
+  RE_PORT->CR1 |= (uint8_t)RE_A_PIN;
+  RE_PORT->CR1 |= (uint8_t)RE_B_PIN;
+  
+  puts("main-2\r\n");
+  RE_PORT->CR2 |= (uint8_t)RE_A_PIN ;
+  puts("main-2.2\r\n");
+  RE_PORT->CR2 |= (uint8_t)RE_B_PIN ;
   LEDOn();
   while (1)
   {
-    puts("main\r\n");
+    printf("main [%d]\r\n", count);
     //puts(TIM1->CNTRL);
-    Delay(1000);
+    Delay(count);
+    LED_PORT->ODR ^= (uint8_t)LED_PIN;
   }
 }
 
