@@ -16,3 +16,4 @@ _deps
 *.cdb
 
 dist/
+src/opt.bin
