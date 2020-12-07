@@ -10,3 +10,6 @@ stm8flash -c stlink -p stm8s003?3 -s opt -r opt.bin
 after read and edit (xxd) the option binary file, write them back
 
 stm8flash -c stlink -p stm8s003?3 -s opt -w opt.bin
+
+
+here we set AFR0 to use PC6 as Timer1 Ch1 
